@@ -8,6 +8,7 @@ const calculate = (homeBet, awayBet, homeGoals, awayGoals) => {
     difference: 0,
     goals5: 0,
     all: 0,
+    matches: 0,
   };
   if (homeGoals === homeBet && awayGoals === awayBet) {
     results.score += 1;
@@ -56,7 +57,7 @@ const calcultePoints = async (match) => {
                 Number(awayGoals),
               );
               const {
-                score, result, difference, goals5, all,
+                score, result, difference, goals5, all, matches,
               } = results;
               const values = {
                 userId,
@@ -68,6 +69,7 @@ const calcultePoints = async (match) => {
                 difference,
                 goals5,
                 all,
+                matches,
               };
               createOrUpdate(db.Result, values, { userId, matchId: Number(id) });
             }
