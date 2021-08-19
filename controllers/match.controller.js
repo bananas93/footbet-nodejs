@@ -41,6 +41,7 @@ const getAllMatches = async (req, res) => {
     }, {});
     const groupArrays = Object.keys(groups).map((date, index) => ({
       id: index,
+      tour: groups[date][0].stage,
       date,
       games: groups[date],
     }));
