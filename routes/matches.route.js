@@ -4,6 +4,6 @@ const matchController = require('../controllers/match.controller');
 
 const router = Router();
 
-router.get('/:tournament', matchController.getAllMatches);
+router.get('/:tournament', matchController.findAllMatches);
 
 module.exports = router;

@@ -1,21 +1,10 @@
-const db = require('../models');
-const createOrUpdate = require('../helpers/createOrUpdate');
+const betService = require('../services/bet.service');
 
 const addUpdateBet = async (req, res) => {
   try {
     const userId = req.userData.id;
     const { homeBet, awayBet, matchId } = req.body;
-    const values = {
-      homeBet: Number(homeBet),
-      awayBet: Number(awayBet),
-      userId,
-      matchId: Number(matchId),
-    };
-    const condition = {
-      userId: Number(userId),
-      matchId: Number(matchId),
-    };
-    const result = await createOrUpdate(db.Bet, values, condition);
+    const result = await betService.createOrUpdateBet(userId, homeBet, awayBet, matchId);
     if (!result) {
       return res.status(401).json({ error: 'Помилка збереження прогнозу' });
     }
@@ -28,11 +17,11 @@ const addUpdateBet = async (req, res) => {
 const deleteById = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await db.Bet.destroy({ where: { id } });
-    return res.status(200).json({
-      message: 'Прогноз успішно видалено',
-      course: data,
-    });
+    const data = await betService.deleteById(id);
+    if (!data) {
+      return res.status(404).json({ message: 'Прогноз не знайдено' });
+    }
+    return res.status(200).json({ message: 'Прогноз успішно видалено' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
