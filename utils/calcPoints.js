@@ -82,4 +82,9 @@ const calcultePoints = async (match) => {
     });
 };
 
-module.exports = calcultePoints;
+const calcFunctions = {
+  calculate,
+  calcultePoints,
+};
+
+module.exports = calcFunctions;
