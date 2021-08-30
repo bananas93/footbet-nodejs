@@ -2,10 +2,10 @@
 const db = require('../models');
 const calcFunctions = require('../utils/calcPoints');
 
-const findAll = async (tournament) => {
+const findAll = async (tournament, userId) => {
   try {
     let matches = await db.Match.findAll({
-      attributes: ['id', 'stage', 'group', 'status', 'homeGoals', 'awayGoals', 'datetime'],
+      attributes: ['id', 'stage', 'group', 'status', 'homeGoals', 'awayGoals', 'datetime', 'tournament_id'],
       where: {
         tournament_id: tournament,
       },
@@ -24,7 +24,9 @@ const findAll = async (tournament) => {
           model: db.Bet,
           as: 'bets',
           attributes: ['id', 'homeBet', 'awayBet'],
-          include: [{ model: db.User, as: 'user', attributes: ['name'] }],
+          include: [
+            { model: db.User, as: 'user', attributes: ['id', 'name'] },
+          ],
         },
       ],
     });
@@ -34,6 +36,7 @@ const findAll = async (tournament) => {
     matches = matches.map((game) => {
       game.bets.map((bet) => {
         bet.dataValues.bet = `${bet.homeBet}-${bet.awayBet}`;
+        const myBet = bet.dataValues.user.id === userId;
         const points = calcFunctions.calculate(
           bet.homeBet,
           bet.awayBet,
@@ -41,6 +44,7 @@ const findAll = async (tournament) => {
           game.awayGoals,
         );
         bet.dataValues.points = points.all;
+        bet.dataValues.myBet = myBet;
         return bet;
       });
       return game;

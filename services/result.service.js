@@ -14,9 +14,12 @@ const findAll = async (tournament) => {
       [db.sequelize.fn('sum', db.sequelize.col('result')), 'result'],
       [db.sequelize.fn('sum', db.sequelize.col('score')), 'score'],
       [db.sequelize.fn('sum', db.sequelize.col('all')), 'all'],
+      [db.sequelize.literal('(RANK() OVER (ORDER BY all DESC))'), 'rank'],
     ],
     group: ['userId'],
-    include: [{ model: db.User, as: 'user', attributes: ['name'] }],
+    include: [
+      { model: db.User, as: 'user', attributes: ['id', 'name'] },
+    ],
   });
   return result;
 };

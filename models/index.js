@@ -29,6 +29,7 @@ db.Result = require('./result.model')(sequelize, Sequelize);
 
 db.Tournament.hasMany(db.Result);
 db.Match.hasMany(db.Bet);
+db.Tournament.hasMany(db.Bet);
 db.Match.hasMany(db.Result);
 db.Match.belongsTo(db.Tournament, { as: 'tournamentId', foreignKey: 'tournament_id' });
 db.Match.belongsTo(db.Team, { as: 'homeTeam', foreignKey: 'home_team' });
@@ -37,5 +38,6 @@ db.User.hasMany(db.Result);
 db.User.hasMany(db.Bet);
 db.Result.belongsTo(db.User);
 db.Bet.belongsTo(db.User);
+db.Bet.belongsTo(db.Match);
 
 module.exports = db;

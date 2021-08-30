@@ -2,8 +2,9 @@ const matchService = require('../services/match.service');
 
 const findAllMatches = async (req, res) => {
   try {
+    const userId = req.userData.id;
     const { tournament } = req.params;
-    const matches = await matchService.findAll(tournament);
+    const matches = await matchService.findAll(tournament, userId);
     if (matches === null || matches.length < 1) {
       return res.status(404).json({ message: 'Матчів не знайдено' });
     }

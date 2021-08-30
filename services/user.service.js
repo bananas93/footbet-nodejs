@@ -26,9 +26,26 @@ const userLogin = async (email, password) => {
   return result;
 };
 
+const userDetails = async (id) => {
+  const user = await db.User.findByPk(id);
+  return user;
+};
+
+const updateUser = async (id, email, name, password) => {
+  const user = await db.User.findByPk(id);
+  console.log(user);
+  if (!user) {
+    return false;
+  }
+  const result = await user.update({ email, name, password });
+  return result;
+};
+
 const userService = {
   userRegister,
   userLogin,
+  userDetails,
+  updateUser,
 };
 
 module.exports = userService;

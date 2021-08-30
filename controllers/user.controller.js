@@ -28,9 +28,39 @@ const userLogin = async (req, res) => {
   }
 };
 
+const userInfo = async (req, res) => {
+  try {
+    const { id } = req.userData;
+    const result = await userService.userDetails(id);
+    const { dataValues } = result;
+    if (result.error) {
+      res.status(401).json({ error: 'Неправильний email або пароль' });
+    }
+    res.status(200).json(dataValues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateUserInfo = async (req, res) => {
+  try {
+    const { id } = req.userData;
+    const { email, name, password } = req.body;
+    const result = await userService.updateUser(id, email, name, password);
+    if (result.error) {
+      res.status(401).json({ error: 'Неправильний email або пароль' });
+    }
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const userController = {
   userRegister,
   userLogin,
+  userInfo,
+  updateUserInfo,
 };
 
 module.exports = userController;
