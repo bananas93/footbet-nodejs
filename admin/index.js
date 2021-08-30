@@ -1,6 +1,6 @@
 const AdminBro = require('admin-bro');
 const AdminBroSequelize = require('@admin-bro/sequelize');
-const calcPoints = require('../utils/calcPoints');
+const calcFunctions = require('../utils/calcPoints');
 
 const db = require('../models');
 
@@ -66,7 +66,7 @@ const adminBro = new AdminBro({
         actions: {
           edit: {
             after: async (originalResponse, request) => {
-              calcPoints(request.payload);
+              calcFunctions.calcultePoints(request.payload);
               return originalResponse;
             },
           },

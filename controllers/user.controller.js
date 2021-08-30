@@ -1,17 +1,15 @@
-const db = require('../models');
+const userService = require('../services/user.service');
 
 const userRegister = async (req, res) => {
   try {
     const { email, name, password } = req.body;
-    const isUser = await db.User.findOne({ where: { email } });
-    if (isUser !== null) {
+    const result = await userService.userRegister(email, name, password);
+    if (result.alreadyRegister) {
       res.status(409).json({
         error: `Користувач з email ${email} вже зареєстрований`,
       });
     }
-    const user = await db.User.create({ name, email, password });
-    const token = await db.User.generateAuthToken(user.dataValues);
-    res.status(201).json({ token });
+    res.status(201).json({ token: result.token, user: result.user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -20,12 +18,39 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await db.User.findByCredentials(email, password);
-    if (!user) {
-      res.status(401).json({ error: 'Помилка авторизації!' });
+    const result = await userService.userLogin(email, password);
+    if (result.error) {
+      res.status(401).json({ error: 'Неправильний email або пароль' });
     }
-    const token = await db.User.generateAuthToken(user);
-    res.status(200).json({ token });
+    res.status(200).json({ token: result.token });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const userInfo = async (req, res) => {
+  try {
+    const { id } = req.userData;
+    const result = await userService.userDetails(id);
+    const { dataValues } = result;
+    if (result.error) {
+      res.status(401).json({ error: 'Неправильний email або пароль' });
+    }
+    res.status(200).json(dataValues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const updateUserInfo = async (req, res) => {
+  try {
+    const { id } = req.userData;
+    const { email, name, password } = req.body;
+    const result = await userService.updateUser(id, email, name, password);
+    if (result.error) {
+      res.status(401).json({ error: 'Неправильний email або пароль' });
+    }
+    res.status(201).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -34,6 +59,8 @@ const userLogin = async (req, res) => {
 const userController = {
   userRegister,
   userLogin,
+  userInfo,
+  updateUserInfo,
 };
 
 module.exports = userController;

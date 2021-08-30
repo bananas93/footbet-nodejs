@@ -10,19 +10,35 @@ passport.use(new GoogleStrategy({
   clientSecret: 'zjXRM1LCGyIPFouWFEw7OUIj',
   callbackURL: 'http://localhost:3000/api/auth/google/callback',
 },
-((accessToken, refreshToken, profile, done) => {
-  console.log(profile);
-  // db.User.findOrCreate({ googleId: profile.id }, (err, user) => done(err, user));
+(async (accessToken, refreshToken, profile, done) => {
+  const { displayName, id, emails } = profile;
+  const user = await db.User.findOrCreate({
+    where: { googleId: id },
+    defaults: {
+      name: displayName,
+      googleId: id,
+      email: emails[0].value,
+    },
+  });
+  done(user);
 })));
 
-router.get('/',
-  passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    const { token } = req.user;
-    res.redirect(`http://localhost:3001?token=${token}`);
-  });
+router.get('/callback', (req, res, next) => passport.authenticate('google', async (user, err) => {
+  if (err) {
+    return res.status(500).json({ error: err.message });
+  }
+  const token = await db.User.generateAuthToken(user[0].dataValues);
+  res.cookie(
+    'JWToken',
+    token,
+    {
+      expires: new Date(Date.now() + 2 * 604800000),
+      path: '/',
+    },
+  );
+  return res.redirect('http://localhost:3001/');
+})(req, res, next));
 
 module.exports = router;
