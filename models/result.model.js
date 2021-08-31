@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       field: 'all',
     },
+    matches: {
+      type: DataTypes.INTEGER,
+      field: 'matches',
+    },
   }, {
     underscored: true,
     freezeTableName: true,
