@@ -40,12 +40,28 @@ const updateUser = async (id, email, name, password) => {
   const result = await user.update({ email, name, password });
   return result;
 };
+const getAllUsers = async () => {
+  const users = await db.User.findAll({ attributes: ['id', ['name', 'user_name']] });
+  const result = users.map((user) => {
+    const newData = user.dataValues;
+    newData.rank = 1;
+    newData.matches = 0;
+    newData.result = 0;
+    newData.difference = 0;
+    newData.goals5 = 0;
+    newData.score = 0;
+    newData.all = 0;
+    return newData;
+  });
+  return result;
+};
 
 const userService = {
   userRegister,
   userLogin,
   userDetails,
   updateUser,
+  getAllUsers,
 };
 
 module.exports = userService;

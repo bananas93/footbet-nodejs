@@ -1,11 +1,13 @@
 const resultService = require('../services/result.service');
+const userService = require('../services/user.service');
 
 const getResults = async (req, res) => {
   try {
     const { tournament } = req.params;
     const result = await resultService.findAll(tournament);
     if (result === null || result.length < 1) {
-      return res.status(404).json({ message: 'Результатів немає' });
+      const users = await userService.getAllUsers();
+      return res.status(200).json(users);
     }
     return res.status(200).json(result);
   } catch (err) {

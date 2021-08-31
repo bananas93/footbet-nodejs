@@ -52,6 +52,18 @@ const adminBro = new AdminBro({
       resource: Match,
       options: {
         properties: {
+          home_team: {
+            position: 1,
+          },
+          away_team: {
+            position: 2,
+          },
+          homeGoals: {
+            position: 3,
+          },
+          awayGoals: {
+            position: 4,
+          },
           updatedAt: {
             isVisible: {
               show: false,
