@@ -33,7 +33,6 @@ const userDetails = async (id) => {
 
 const updateUser = async (id, email, name, password) => {
   const user = await db.User.findByPk(id);
-  console.log(user);
   if (!user) {
     return false;
   }

@@ -8,7 +8,7 @@ const router = Router();
 passport.use(new GoogleStrategy({
   clientID: '675019088327-o7m0q41l96r78innp6dcbep8gmu6hr2i.apps.googleusercontent.com',
   clientSecret: 'zjXRM1LCGyIPFouWFEw7OUIj',
-  callbackURL: 'http://localhost:3000/api/auth/google/callback',
+  callbackURL: 'https://footbet.site/new/api/auth/google/callback',
 },
 (async (accessToken, refreshToken, profile, done) => {
   const { displayName, id, emails } = profile;
@@ -38,7 +38,7 @@ router.get('/callback', (req, res, next) => passport.authenticate('google', asyn
       path: '/',
     },
   );
-  return res.redirect('http://localhost:3001/');
+  return res.redirect('https://footbet.site/new/');
 })(req, res, next));
 
 module.exports = router;
