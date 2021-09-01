@@ -56,11 +56,24 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userService.getAllUsers();
+    if (users === null || users.length < 1) {
+      return res.status(404).json({ message: 'Матчів не знайдено' });
+    }
+    return res.status(200).json(users);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 const userController = {
   userRegister,
   userLogin,
   userInfo,
   updateUserInfo,
+  getAllUsers,
 };
 
 module.exports = userController;
