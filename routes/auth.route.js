@@ -30,15 +30,7 @@ router.get('/callback', (req, res, next) => passport.authenticate('google', asyn
     return res.status(500).json({ error: err.message });
   }
   const token = await db.User.generateAuthToken(user[0].dataValues);
-  res.cookie(
-    'JWToken',
-    token,
-    {
-      expires: new Date(Date.now() + 2 * 604800000),
-      path: '/',
-    },
-  );
-  return res.redirect('https://footbet.netlify.app/');
+  return res.redirect(`https://footbet.netlify.app/?token=${token}`);
 })(req, res, next));
 
 module.exports = router;
