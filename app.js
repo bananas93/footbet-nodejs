@@ -21,7 +21,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/api/matches', checkToken, require('./routes/matches.route'));
 app.use('/api/results', checkToken, require('./routes/results.route'));
@@ -31,5 +31,9 @@ app.use('/api/auth/google', require('./routes/auth.route'));
 
 const router = AdminBroExpress.buildRouter(admin);
 app.use(admin.options.rootPath, router);
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 module.exports = app;
