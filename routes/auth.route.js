@@ -30,15 +30,11 @@ router.get('/callback', (req, res, next) => passport.authenticate('google', asyn
     return res.status(500).json({ error: err.message });
   }
   const token = await db.User.generateAuthToken(user[0].dataValues);
-  const now = new Date();
-  const time = now.getTime();
-  const expireTime = time + 1000 * 36000;
-  now.setTime(expireTime);
   res.cookie(
     'JWToken',
     token,
     {
-      expires: now.toUTCString(),
+      expires: new Date(Date.now() + 10 * 604800000),
       path: '/',
     },
   );
