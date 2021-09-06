@@ -10,6 +10,11 @@ module.exports = (sequelize, DataTypes) => {
       field: 'slug',
       allowNull: false,
     },
+    logo: {
+      type: DataTypes.STRING,
+      field: 'logo',
+      allowNull: false,
+    },
   }, {
     underscored: true,
     freezeTableName: true,
