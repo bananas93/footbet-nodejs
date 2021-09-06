@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use('/api/matches', checkToken, require('./routes/matches.route'));
 app.use('/api/results', checkToken, require('./routes/results.route'));
 app.use('/api/bets', checkToken, require('./routes/bets.route'));
+app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
 app.use('/api/users', require('./routes/users.route'));
 app.use('/api/auth/google', require('./routes/auth.route'));
 
