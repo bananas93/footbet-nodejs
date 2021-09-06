@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
       field: 'name',
       allowNull: false,
     },
+    slug: {
+      type: DataTypes.STRING,
+      field: 'slug',
+      allowNull: false,
+    },
   }, {
     underscored: true,
     freezeTableName: true,
