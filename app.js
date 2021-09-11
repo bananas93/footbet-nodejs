@@ -9,7 +9,7 @@ const admin = require('./admin');
 
 const db = require('./models');
 
-db.sequelize.sync();
+db.sequelize.sync({ alter: true });
 
 const checkToken = require('./utils/checkToken');
 
