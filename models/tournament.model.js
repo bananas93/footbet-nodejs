@@ -10,10 +10,24 @@ module.exports = (sequelize, DataTypes) => {
       field: 'slug',
       allowNull: false,
     },
+    groupTours: {
+      type: DataTypes.INTEGER,
+      field: 'groups',
+      allowNull: false,
+    },
+    playoffTours: {
+      type: DataTypes.INTEGER,
+      field: 'playoff',
+      allowNull: false,
+    },
     logo: {
       type: DataTypes.STRING,
       field: 'logo',
       allowNull: false,
+    },
+    archive: {
+      type: DataTypes.BOOLEAN,
+      field: 'archive',
     },
   }, {
     underscored: true,
