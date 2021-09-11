@@ -5,6 +5,12 @@ module.exports = (sequelize, DataTypes) => {
       field: 'name',
       allowNull: false,
     },
+    type: {
+      type: DataTypes.ENUM('Клуб', 'Збірна'),
+      field: 'type',
+      defaultValue: 'Клуб',
+      allowNull: false,
+    },
   }, {
     underscored: true,
     freezeTableName: true,
