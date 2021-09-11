@@ -1,6 +1,7 @@
 const AdminBro = require('admin-bro');
 const AdminBroSequelize = require('@admin-bro/sequelize');
 const calcFunctions = require('../utils/calcPoints');
+const socket = require('../socketapi');
 
 const db = require('../models');
 
@@ -35,6 +36,24 @@ const adminBro = new AdminBro({
       resource: Tournament,
       options: {
         properties: {
+          name: {
+            position: 1,
+          },
+          slug: {
+            position: 2,
+          },
+          logo: {
+            position: 3,
+          },
+          groupTours: {
+            position: 4,
+          },
+          playoffTours: {
+            position: 5,
+          },
+          archive: {
+            position: 6,
+          },
           updatedAt: {
             isVisible: {
               show: false,
@@ -79,6 +98,7 @@ const adminBro = new AdminBro({
           edit: {
             after: async (originalResponse, request) => {
               calcFunctions.calcultePoints(request.payload);
+              socket.io.emit('matchUpdate', request.payload);
               return originalResponse;
             },
           },
