@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon node ./bin/www",
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "dependencies": {
     "@admin-bro/express": "^3.1.0",
