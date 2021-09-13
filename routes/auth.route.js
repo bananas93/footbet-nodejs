@@ -38,7 +38,7 @@ router.get('/callback', (req, res, next) => passport.authenticate('google', asyn
       path: '/',
     },
   );
-  return res.redirect('https://footbet.herokuapp.com/');
+  return res.redirect('https://footbet.herokuapp.com/profile');
 })(req, res, next));
 
 module.exports = router;
