@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const AdminBroExpress = require('@admin-bro/express');
 const admin = require('./admin');
-
 const db = require('./models');
 
 db.sequelize.sync();
@@ -28,6 +27,7 @@ app.use('/api/results', checkToken, require('./routes/results.route'));
 app.use('/api/bets', checkToken, require('./routes/bets.route'));
 app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
 app.use('/api/users', require('./routes/users.route'));
+app.use('/api/chat', checkToken, require('./routes/chat.route'));
 app.use('/api/auth/google', require('./routes/auth.route'));
 
 const router = AdminBroExpress.buildRouter(admin);
