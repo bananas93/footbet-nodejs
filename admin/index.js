@@ -8,7 +8,7 @@ const db = require('../models');
 AdminBro.registerAdapter(AdminBroSequelize);
 
 const {
-  Team, Tournament, Match, User, Bet, Result,
+  Team, Tournament, Match, User, Bet, Result, Chat,
 } = db;
 
 const adminBro = new AdminBro({
@@ -140,6 +140,7 @@ const adminBro = new AdminBro({
         },
       },
     },
+    { resource: Chat },
   ],
 });
 
