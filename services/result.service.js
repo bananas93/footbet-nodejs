@@ -11,6 +11,7 @@ const findAll = async (tournament) => {
     attributes: [
       'id',
       'userId',
+      [db.sequelize.fn('count', '*'), 'matches'],
       [db.sequelize.fn('sum', db.sequelize.col('result.goals5')), 'goals5'],
       [db.sequelize.fn('sum', db.sequelize.col('result.difference')), 'difference'],
       [db.sequelize.fn('sum', db.sequelize.col('result.result')), 'result'],
@@ -23,6 +24,7 @@ const findAll = async (tournament) => {
       [db.sequelize.fn('SUM', db.sequelize.col('result.result')), 'DESC'],
       [db.sequelize.fn('SUM', db.sequelize.col('result.difference')), 'DESC'],
       [db.sequelize.fn('SUM', db.sequelize.col('result.goals5')), 'DESC'],
+      [db.sequelize.fn('count', '*'), 'ASC'],
     ],
     include: [
       {
