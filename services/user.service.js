@@ -1,4 +1,6 @@
+/* eslint-disable no-param-reassign */
 const db = require('../models');
+const calcFunctions = require('../utils/calcPoints');
 
 const userRegister = async (email, name, password) => {
   const result = { alreadyRegister: false };
@@ -55,12 +57,117 @@ const getAllUsers = async () => {
   return result;
 };
 
+const usersDetails = async (id, tournament) => {
+  const result = await db.Result.findAll({
+    where: {
+      userId: id,
+      tournament_id: tournament,
+    },
+    attributes: [
+      'id',
+      'userId',
+      [db.sequelize.fn('count', '*'), 'matches'],
+      [db.sequelize.fn('sum', db.sequelize.col('result.goals5')), 'goals5'],
+      [db.sequelize.fn('sum', db.sequelize.col('result.difference')), 'difference'],
+      [db.sequelize.fn('sum', db.sequelize.col('result.result')), 'result'],
+      [db.sequelize.fn('sum', db.sequelize.col('result.score')), 'score'],
+      [db.sequelize.fn('sum', db.sequelize.col('result.all')), 'all'],
+    ],
+    order: [
+      [db.sequelize.fn('SUM', db.sequelize.col('result.all')), 'DESC'],
+      [db.sequelize.fn('SUM', db.sequelize.col('result.score')), 'DESC'],
+      [db.sequelize.fn('SUM', db.sequelize.col('result.result')), 'DESC'],
+      [db.sequelize.fn('SUM', db.sequelize.col('result.difference')), 'DESC'],
+      [db.sequelize.fn('SUM', db.sequelize.col('result.goals5')), 'DESC'],
+      [db.sequelize.fn('count', '*'), 'ASC'],
+    ],
+    include: [
+      {
+        model: db.User, as: 'user', attributes: ['id', 'name'],
+      },
+    ],
+  });
+  let matches = await db.Match.findAll({
+    attributes: ['id', 'stage', 'homeGoals', 'awayGoals'],
+    where: {
+      tournament_id: tournament,
+      status: ['Live', 'Завершено'],
+    },
+    include: [
+      {
+        model: db.Team,
+        as: 'homeTeam',
+        attributes: ['name'],
+      },
+      {
+        model: db.Team,
+        as: 'awayTeam',
+        attributes: ['name'],
+      },
+      {
+        model: db.Bet,
+        as: 'bets',
+        attributes: ['id', 'homeBet', 'awayBet'],
+        include: [
+          {
+            model: db.User,
+            as: 'user',
+            attributes: [],
+            where: {
+              id,
+            },
+          },
+        ],
+      },
+    ],
+  });
+  if (matches === null || matches.length < 1) {
+    return [];
+  }
+  matches = matches.map((game) => {
+    const { 0: bet } = game.bets;
+    game.dataValues.bet = bet;
+    delete game.dataValues.bets;
+    const points = calcFunctions.calculate(
+      bet.homeBet,
+      bet.awayBet,
+      game.homeGoals,
+      game.awayGoals,
+    );
+    bet.dataValues.points = points.all;
+    if (points.all === 0) {
+      bet.dataValues.empty = true;
+    }
+    if (points.all === 2) {
+      bet.dataValues.score = true;
+    }
+    if (points.all === 3) {
+      bet.dataValues.score = true;
+      bet.dataValues.difference = true;
+    }
+    if (points.all === 5) {
+      bet.dataValues.result = true;
+      bet.dataValues.score = true;
+      bet.dataValues.difference = true;
+    }
+    if (points.all === 6) {
+      bet.dataValues.result = true;
+      bet.dataValues.score = true;
+      bet.dataValues.difference = true;
+      bet.dataValues.goals5 = true;
+    }
+    return game;
+  });
+  return { result, matches };
+};
+
 const userService = {
   userRegister,
   userLogin,
   userDetails,
   updateUser,
   getAllUsers,
+  usersDetails,
 };
 
 module.exports = userService;
