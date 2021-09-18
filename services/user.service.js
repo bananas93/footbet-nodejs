@@ -124,7 +124,8 @@ const usersDetails = async (id, tournament) => {
   if (matches === null || matches.length < 1) {
     return [];
   }
-  matches = matches.map((game) => {
+
+  matches = matches.filter((game) => game.bets.length > 0).map((game) => {
     const { 0: bet } = game.bets;
     game.dataValues.bet = bet;
     delete game.dataValues.bets;
@@ -142,22 +143,17 @@ const usersDetails = async (id, tournament) => {
       bet.dataValues.score = true;
     }
     if (points.all === 3) {
-      bet.dataValues.score = true;
       bet.dataValues.difference = true;
     }
     if (points.all === 5) {
       bet.dataValues.result = true;
-      bet.dataValues.score = true;
-      bet.dataValues.difference = true;
     }
     if (points.all === 6) {
-      bet.dataValues.result = true;
-      bet.dataValues.score = true;
-      bet.dataValues.difference = true;
       bet.dataValues.goals5 = true;
     }
     return game;
   });
+
   return { result, matches };
 };
 
