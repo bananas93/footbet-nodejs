@@ -57,7 +57,7 @@ const getAllUsers = async () => {
   return result;
 };
 
-const usersDetails = async (id, tournament) => {
+const usersDetails = async (id, tournament, tour) => {
   const result = await db.Result.findAll({
     where: {
       userId: id,
@@ -92,6 +92,7 @@ const usersDetails = async (id, tournament) => {
     where: {
       tournament_id: tournament,
       status: ['Live', 'Завершено'],
+      stage: tour ? `${tour} тур` : ['1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур'],
     },
     include: [
       {
