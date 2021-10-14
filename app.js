@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
@@ -5,8 +6,38 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const AdminBroExpress = require('@admin-bro/express');
+const jwt = require('jsonwebtoken');
 const admin = require('./admin');
 const db = require('./models');
+const { io } = require('./socketapi');
+
+const clients = [];
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jwt.verify(socket.handshake.query.token, 'mC9XjvNqXP97cgKBVDDABPd2kUL2Uk6TYPQHatR0NnwM5PYBZmXTpAM2Snyi3vWWy6JP7qdTRcTtbFUXBmBeHjl3ejnyG1', (err, decoded) => {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      next();
+    });
+  } else {
+    next(new Error('Authentication error'));
+  }
+})
+  .on('connection', (socket) => {
+    const { id } = socket.decoded;
+    const index = clients.findIndex((client) => client === id);
+    if (index === -1) {
+      clients.push(id);
+    }
+    io.emit('online', JSON.stringify(clients));
+
+    socket.on('disconnect', () => {
+      if (index !== -1) {
+        clients.splice(index, 1);
+      }
+      io.emit('online', JSON.stringify(clients));
+    });
+  });
 
 db.sequelize.sync();
 
