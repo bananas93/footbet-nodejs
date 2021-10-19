@@ -30,7 +30,7 @@ const calculate = (homeBet, awayBet, homeGoals, awayGoals) => {
     results.difference += 1;
   }
   results.all = (results.result * 2) + (results.score * 2);
-  results.all += results.goals5 * 2;
+  results.all += results.goals5;
   results.all += results.difference;
   results.matches += 1;
   return results;
