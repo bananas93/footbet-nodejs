@@ -7,6 +7,9 @@ const getAllMessages = async () => {
     include: [
       { model: db.User, attributes: ['id', 'name'] },
     ],
+    order: [
+      ['createdAt', 'ASC'],
+    ],
   });
 
   const groups = messages.reduce((allGroups, day) => {
