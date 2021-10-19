@@ -77,9 +77,22 @@ const getAllUsers = async (req, res) => {
   try {
     const users = await userService.getAllUsers();
     if (users === null || users.length < 1) {
-      return res.status(404).json({ message: 'Матчів не знайдено' });
+      return res.status(404).json({ message: 'Користувачів не знайдено' });
     }
     return res.status(200).json(users);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+const getOneUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await userService.userDetails(id);
+    if (user === null || user.length < 1) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+    return res.status(200).json(user);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -92,6 +105,7 @@ const userController = {
   updateUserInfo,
   getAllUsers,
   getUserDetails,
+  getOneUser,
 };
 
 module.exports = userController;

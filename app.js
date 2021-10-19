@@ -9,15 +9,19 @@ const AdminBroExpress = require('@admin-bro/express');
 const jwt = require('jsonwebtoken');
 const admin = require('./admin');
 const db = require('./models');
+const userService = require('./services/user.service');
 const { io } = require('./socketapi');
+const chatService = require('./services/chat.service');
 
 const clients = [];
 io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
-    jwt.verify(socket.handshake.query.token, 'mC9XjvNqXP97cgKBVDDABPd2kUL2Uk6TYPQHatR0NnwM5PYBZmXTpAM2Snyi3vWWy6JP7qdTRcTtbFUXBmBeHjl3ejnyG1', (err, decoded) => {
+    jwt.verify(socket.handshake.query.token, 'mC9XjvNqXP97cgKBVDDABPd2kUL2Uk6TYPQHatR0NnwM5PYBZmXTpAM2Snyi3vWWy6JP7qdTRcTtbFUXBmBeHjl3ejnyG1', async (err, decoded) => {
       if (err) return next(new Error('Authentication error'));
       socket.decoded = decoded;
-      next();
+      const { id } = socket.decoded;
+      socket.user = await userService.userDetails(id);
+      return next();
     });
   } else {
     next(new Error('Authentication error'));
@@ -29,13 +33,26 @@ io.use((socket, next) => {
     if (index === -1) {
       clients.push(id);
     }
-    io.emit('online', JSON.stringify(clients));
+    socket.emit('online', JSON.stringify(clients));
+
+    socket.on('chatMessage', async (msg) => {
+      const { name } = socket.user.dataValues;
+      chatService.saveMessage(id, msg);
+      const message = {
+        id: new Date().getTime(),
+        message: msg,
+        user: {
+          name,
+        },
+      };
+      socket.broadcast.emit('message', message);
+    });
 
     socket.on('disconnect', () => {
       if (index !== -1) {
         clients.splice(index, 1);
       }
-      io.emit('online', JSON.stringify(clients));
+      socket.emit('online', JSON.stringify(clients));
     });
   });
 

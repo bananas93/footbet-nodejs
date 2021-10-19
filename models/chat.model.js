@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const Chat = sequelize.define('chat', {
     message: {
       type: DataTypes.STRING,
-      field: 'away_bet',
+      field: 'message',
       allowNull: false,
     },
   }, {
