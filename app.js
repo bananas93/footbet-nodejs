@@ -14,6 +14,7 @@ const { io } = require('./socketapi');
 const chatService = require('./services/chat.service');
 
 const clients = [];
+const userTyping = [];
 io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
     jwt.verify(socket.handshake.query.token, 'mC9XjvNqXP97cgKBVDDABPd2kUL2Uk6TYPQHatR0NnwM5PYBZmXTpAM2Snyi3vWWy6JP7qdTRcTtbFUXBmBeHjl3ejnyG1', async (err, decoded) => {
@@ -46,6 +47,22 @@ io.use((socket, next) => {
         },
       };
       socket.broadcast.emit('message', message);
+    });
+
+    socket.on('messageTyping', async (data) => {
+      const { name, typing } = data;
+      const indexUser = userTyping.findIndex((client) => client === name);
+      if (typing) {
+        if (indexUser === -1) {
+          userTyping.push(name);
+        }
+        socket.broadcast.emit('typingUsers', userTyping);
+      } else {
+        if (indexUser !== -1) {
+          userTyping.splice(indexUser, 1);
+        }
+        socket.broadcast.emit('typingUsers', userTyping);
+      }
     });
 
     socket.on('disconnect', () => {
