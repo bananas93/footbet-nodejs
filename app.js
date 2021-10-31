@@ -94,7 +94,6 @@ app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
 app.use('/api/users', require('./routes/users.route'));
 app.use('/api/chat', checkToken, require('./routes/chat.route'));
 app.use('/api/auth/google', require('./routes/auth.route'));
-app.use('/api/authAndroid/google', require('./routes/authAndroid.route'));
 
 const router = AdminBroExpress.buildRouter(admin);
 app.use(admin.options.rootPath, router);
