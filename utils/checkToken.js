@@ -7,6 +7,7 @@ const checkToken = (req, res, next) => {
     req.userData = decoded;
     next();
   } catch (err) {
+    res.clearCookie('JWToken');
     res.status(403).json({
       message: 'Помилка авторизації',
     });
