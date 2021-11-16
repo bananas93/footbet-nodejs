@@ -8,9 +8,7 @@ const checkToken = (req, res, next) => {
     next();
   } catch (err) {
     res.clearCookie('JWToken');
-    res.status(403).json({
-      message: 'Помилка авторизації',
-    });
+    return res.redirect('https://footbet.site/');
   }
 };
 
