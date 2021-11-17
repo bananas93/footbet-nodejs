@@ -14,12 +14,12 @@ const findAll = async (tournament, userId) => {
         {
           model: db.Team,
           as: 'homeTeam',
-          attributes: ['name'],
+          attributes: ['id', 'name'],
         },
         {
           model: db.Team,
           as: 'awayTeam',
-          attributes: ['name'],
+          attributes: ['id', 'name'],
         },
         {
           model: db.Bet,
@@ -48,6 +48,7 @@ const findAll = async (tournament, userId) => {
         bet.dataValues.myBet = myBet;
         return bet;
       });
+      game.bets.sort((a, b) => b.dataValues.points - a.dataValues.points);
       return game;
     });
     const groups = matches.reduce((allGroups, game) => {
@@ -88,12 +89,12 @@ const findPrev = async (tournament, page, size, userId) => {
         {
           model: db.Team,
           as: 'homeTeam',
-          attributes: ['name'],
+          attributes: ['id', 'name'],
         },
         {
           model: db.Team,
           as: 'awayTeam',
-          attributes: ['name'],
+          attributes: ['id', 'name'],
         },
         {
           model: db.Bet,
@@ -122,6 +123,7 @@ const findPrev = async (tournament, page, size, userId) => {
         bet.dataValues.myBet = myBet;
         return bet;
       });
+      game.bets.sort((a, b) => b.dataValues.points - a.dataValues.points);
       return game;
     });
     const groups = matches.reduce((allGroups, game) => {
@@ -193,6 +195,7 @@ const findNext = async (tournament, page, size, userId) => {
         bet.dataValues.myBet = myBet;
         return bet;
       });
+      game.bets.sort((a, b) => b.dataValues.points - a.dataValues.points);
       return game;
     });
     const groups = matches.reduce((allGroups, game) => {
