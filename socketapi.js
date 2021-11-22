@@ -1,6 +1,6 @@
 const io = require('socket.io')({
   cors: {
-    origin: 'https://footbet.site',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 });
