@@ -4,7 +4,7 @@ const getMessages = async (req, res) => {
   try {
     const result = await chatService.getAllMessages();
     if (result === null || result.length < 1) {
-      return res.status(404).json({ message: 'Турнірів не знайдено' });
+      return res.status(404).json({ message: 'Повідомлень не знайдено' });
     }
     return res.status(200).json(result);
   } catch (err) {
@@ -45,7 +45,7 @@ const deleteById = async (req, res) => {
     if (!data) {
       return res.status(404).json({ message: 'Повідомлення не знайдено' });
     }
-    return res.status(200).json({ message: 'Повідомлення видалено' });
+    return res.status(204).json({ message: 'Повідомлення видалено' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

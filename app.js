@@ -17,7 +17,7 @@ const clients = [];
 const userTyping = [];
 io.use((socket, next) => {
   if (socket.handshake.query && socket.handshake.query.token) {
-    jwt.verify(socket.handshake.query.token, 'mC9XjvNqXP97cgKBVDDABPd2kUL2Uk6TYPQHatR0NnwM5PYBZmXTpAM2Snyi3vWWy6JP7qdTRcTtbFUXBmBeHjl3ejnyG1', async (err, decoded) => {
+    jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) return next(new Error('Authentication error'));
       socket.decoded = decoded;
       const { id } = socket.decoded;
@@ -29,6 +29,7 @@ io.use((socket, next) => {
   }
 })
   .on('connection', (socket) => {
+    socket.emit('user', JSON.stringify(socket.user));
     const { id } = socket.decoded;
     const index = clients.findIndex((client) => client === id);
     if (index === -1) {
