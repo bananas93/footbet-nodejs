@@ -36,15 +36,22 @@ module.exports = (sequelize, DataTypes) => {
   User.beforeUpdate(generateHash);
 
   User.findByCredentials = async (email, password) => {
-    const localUser = await User.findOne({ raw: true, where: { email } });
-    if (!localUser) {
-      throw new Error(`Користувача з email ${email} не знайдено`);
+    try {
+      const localUser = await User.findOne({ raw: true, where: { email } });
+      if (localUser) {
+        if (localUser.password) {
+          const isPasswordMatch = await bcrypt.compare(password, localUser.password);
+          if (isPasswordMatch) {
+            return localUser;
+          }
+          throw new Error('Невірний пароль');
+        }
+        throw new Error('Пароль не встановлено, увійдіть через Google');
+      }
+      throw new Error('Користувача не знайдено');
+    } catch (error) {
+      return error;
     }
-    const isPasswordMatch = await bcrypt.compare(password, localUser.password);
-    if (!isPasswordMatch) {
-      throw new Error('Невірний пароль');
-    }
-    return localUser;
   };
 
   User.generateAuthToken = async ({ id }) => {

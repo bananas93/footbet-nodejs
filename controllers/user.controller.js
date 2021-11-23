@@ -18,13 +18,13 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const result = await userService.userLogin(email, password);
-    if (result.error) {
-      res.status(401).json({ error: 'Неправильний email або пароль' });
+    const token = await userService.userLogin(email, password);
+    if (token instanceof Error) {
+      throw (token);
     }
-    res.status(200).json({ token: result.token });
+    return res.status(200).json({ token });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json(err.message);
   }
 };
 
@@ -62,8 +62,8 @@ const getUserDetails = async (req, res) => {
 const updateUserInfo = async (req, res) => {
   try {
     const { id } = req.userData;
-    const { email, name, password } = req.body;
-    const result = await userService.updateUser(id, email, name, password);
+    const { name, password } = req.body;
+    const result = await userService.updateUser(id, name, password);
     if (result.error) {
       res.status(401).json({ error: 'Неправильний email або пароль' });
     }
