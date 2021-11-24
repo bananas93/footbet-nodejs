@@ -10,14 +10,17 @@ const calculate = (homeBet, awayBet, homeGoals, awayGoals) => {
     all: 0,
     matches: 0,
   };
-  if (homeGoals === homeBet && awayGoals === awayBet) {
+  if (Number(homeGoals) === Number(homeBet) && Number(awayGoals) === Number(awayBet)) {
     results.score += 1;
     results.result += 1;
   } else if (homeGoals > awayGoals && homeBet > awayBet) {
     results.result += 1;
   } else if (homeGoals < awayGoals && homeBet < awayBet) {
     results.result += 1;
-  } else if (homeGoals === awayGoals && homeBet === awayBet && homeGoals !== homeBet) {
+  } else if (
+    Number(homeGoals) === Number(awayGoals)
+    && Number(homeBet) === Number(awayBet)
+    && homeGoals !== homeBet) {
     results.result += 1;
   }
   if (

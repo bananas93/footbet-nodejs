@@ -89,12 +89,34 @@ const findAllUserBets = async (id, tournament) => {
   }
 };
 
+const getBetsByMatch = async (id) => {
+  try {
+    const result = await db.Bet.findAll({
+      where: {
+        match_id: id,
+      },
+      attributes: ['id', 'homeBet', 'awayBet'],
+      include: [
+        {
+          model: db.User,
+          as: 'user',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
 const deleteById = async (id) => db.Bet.destroy({ where: { id } });
 
 const betService = {
   createOrUpdateBet,
   deleteById,
   findAllUserBets,
+  getBetsByMatch,
 };
 
 module.exports = betService;

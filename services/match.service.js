@@ -186,10 +186,10 @@ const findNext = async (tournament, page, size, userId) => {
         bet.dataValues.bet = `${bet.homeBet}-${bet.awayBet}`;
         const myBet = bet.dataValues.user.id === userId;
         const points = calcFunctions.calculate(
-          bet.homeBet,
-          bet.awayBet,
-          game.homeGoals,
-          game.awayGoals,
+          Number(bet.homeBet),
+          Number(bet.awayBet),
+          Number(game.homeGoals),
+          Number(game.awayGoals),
         );
         bet.dataValues.points = points.all;
         bet.dataValues.myBet = myBet;

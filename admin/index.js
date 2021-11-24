@@ -1,9 +1,11 @@
+/* eslint-disable no-param-reassign */
 const AdminBro = require('admin-bro');
 const AdminBroSequelize = require('@admin-bro/sequelize');
+const jwt = require('jsonwebtoken');
 const calcFunctions = require('../utils/calcPoints');
 const socket = require('../socketapi');
-
 const db = require('../models');
+const { getBetsByMatch } = require('../services/bet.service');
 
 AdminBro.registerAdapter(AdminBroSequelize);
 
@@ -97,8 +99,29 @@ const adminBro = new AdminBro({
         actions: {
           edit: {
             after: async (originalResponse, request) => {
-              calcFunctions.calcultePoints(request.payload);
-              socket.io.emit('matchUpdate', request.payload);
+              if (Object.keys(request.payload).length) {
+                const { JWToken } = request.cookies;
+                const decoded = jwt.verify(JWToken, process.env.JWT_SECRET);
+                calcFunctions.calcultePoints(request.payload);
+                const { id } = request.payload;
+                let result = await getBetsByMatch(id);
+                result = result.map((bet) => {
+                  const myBet = bet.dataValues.user.id === decoded.id;
+                  bet.dataValues.bet = `${bet.homeBet}-${bet.awayBet}`;
+                  const points = calcFunctions.calculate(
+                    bet.homeBet,
+                    bet.awayBet,
+                    request.payload.homeGoals,
+                    request.payload.awayGoals,
+                  );
+                  bet.dataValues.points = points.all;
+                  bet.dataValues.myBet = myBet;
+                  return bet;
+                });
+                result.sort((a, b) => b.dataValues.points - a.dataValues.points);
+                request.payload.bets = result;
+                socket.io.emit('matchUpdate', request.payload);
+              }
               return originalResponse;
             },
           },
