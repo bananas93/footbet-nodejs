@@ -1,12 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
   const Match = sequelize.define('match', {
     stage: {
-      type: DataTypes.ENUM('1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур', '1/8 фіналу', '1/4 фіналу', '1/2 фіналу', 'Фінал'),
+      type: DataTypes.ENUM('1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур', '1/16 фіналу', '1/8 фіналу', '1/4 фіналу', '1/2 фіналу', 'Фінал'),
       allowNull: false,
     },
     group: {
       type: DataTypes.ENUM('A', 'B', 'C', 'D', 'E', 'F', 'H', 'G'),
-      allowNull: false,
+      allowNull: true,
     },
     status: {
       type: DataTypes.ENUM('Заплановано', 'Live', 'Завершено', 'Скасовано', 'Перенесено'),
