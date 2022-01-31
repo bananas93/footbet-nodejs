@@ -8,20 +8,20 @@ const router = Router();
 passport.use(new GoogleStrategy({
   clientID: '675019088327-o7m0q41l96r78innp6dcbep8gmu6hr2i.apps.googleusercontent.com',
   clientSecret: 'zjXRM1LCGyIPFouWFEw7OUIj',
-  callbackURL: 'https://footbet.site/api/auth/google/callback',
+  callbackURL: 'https://footbet.pp.ua/api/auth/google/callback',
 },
-(async (accessToken, refreshToken, profile, done) => {
-  const { displayName, id, emails } = profile;
-  const user = await db.User.findOrCreate({
-    where: { googleId: id },
-    defaults: {
-      name: displayName,
-      googleId: id,
-      email: emails[0].value,
-    },
-  });
-  done(user);
-})));
+  (async (accessToken, refreshToken, profile, done) => {
+    const { displayName, id, emails } = profile;
+    const user = await db.User.findOrCreate({
+      where: { googleId: id },
+      defaults: {
+        name: displayName,
+        googleId: id,
+        email: emails[0].value,
+      },
+    });
+    done(user);
+  })));
 
 router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -38,7 +38,7 @@ router.get('/callback', (req, res, next) => passport.authenticate('google', asyn
       path: '/',
     },
   );
-  return res.redirect('https://footbet.site/profile');
+  return res.redirect('https://footbet.pp.ua/profile');
 })(req, res, next));
 
 module.exports = router;

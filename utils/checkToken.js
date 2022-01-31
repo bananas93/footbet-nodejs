@@ -8,7 +8,7 @@ const checkToken = (req, res, next) => {
     return next();
   } catch (err) {
     res.clearCookie('JWToken');
-    return res.redirect('https://footbet.site/login');
+    return res.redirect('https://footbet.pp.ua/login');
   }
 };
 
