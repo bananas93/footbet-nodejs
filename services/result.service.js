@@ -42,10 +42,24 @@ const findAll = async (tournament) => {
 };
 
 const findByTour = async (tournament, tour) => {
+  let stage = `${tour} тур`;
+  if (Number(tour) === 7) {
+    stage = '1/8 фіналу';
+  }
+  if (Number(tour) === '8 тур') {
+    stage = '1/4 фіналу';
+  }
+  if (Number(tour) === '9 тур') {
+    stage = '1/2 фіналу';
+  }
+  if (Number(tour) === '10 тур') {
+    stage = 'Фінал';
+  }
+
   const result = await db.Result.findAll({
     where: {
       tournament_id: tournament,
-      stage: `${tour} тур`,
+      stage,
     },
     attributes: [
       'id',
