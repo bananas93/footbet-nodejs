@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "set CLIENT_URL=https://footbet.pp.ua & node ./bin/www",
-    "dev": "set CLIENT_URL=http://localhost:8080 & nodemon node ./bin/www",
+    "start": "env-cmd -f .env.production node ./bin/www",
+    "dev": "env-cmd -f .env.development nodemon node ./bin/www",
     "test": "jest --forceExit"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^7.29.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-base": "^14.2.1",
