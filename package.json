@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env-cmd -f .env.production node ./bin/www",
-    "dev": "env-cmd -f .env.development nodemon node ./bin/www",
+    "start": "node ./bin/www",
+    "dev": "env-cmd -f .env nodemon node ./bin/www",
     "test": "jest --forceExit"
   },
   "dependencies": {
