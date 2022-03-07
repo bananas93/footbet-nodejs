@@ -6,8 +6,28 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const AdminBroExpress = require('@admin-bro/express');
+const jwt = require('jsonwebtoken');
 const admin = require('./admin');
 const db = require('./models');
+const userService = require('./services/user.service');
+const { io } = require('./config/socketapi');
+
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      const { id } = socket.decoded;
+      socket.user = await userService.userDetails(id);
+      return next();
+    });
+  } else {
+    next(new Error('Authentication error'));
+  }
+})
+  .on('connection', (socket) => {
+    socket.emit('user', JSON.stringify(socket.user));
+  });
 
 db.sequelize.sync();
 

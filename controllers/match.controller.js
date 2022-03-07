@@ -1,10 +1,10 @@
-const matchService = require('../services/match.service');
+const { findAll, editOne } = require('../services/match.service');
 
 const getAllMatches = async (req, res) => {
   try {
     const userId = req.userData.id;
     const { tournament } = req.params;
-    const matches = await matchService.findAll(tournament, userId);
+    const matches = await findAll(tournament, userId);
     if (matches === null || matches.length < 1) {
       return res.status(404).json({ message: 'Матчів не знайдено' });
     }
@@ -14,31 +14,12 @@ const getAllMatches = async (req, res) => {
   }
 };
 
-const getPrevMatches = async (req, res) => {
+const editOneMatch = async (req, res) => {
   try {
-    const userId = req.userData.id;
-    const { tournament } = req.params;
-    const { page, size } = req.query;
-    const matches = await matchService.findPrev(tournament, page, size, userId);
-    if (matches === null || matches.length < 1) {
-      return res.status(404).json({ message: 'Матчів не знайдено' });
-    }
-    return res.status(200).json(matches);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-};
-
-const getNextMatches = async (req, res) => {
-  try {
-    const userId = req.userData.id;
-    const { tournament } = req.params;
-    const { page, size } = req.query;
-    const matches = await matchService.findNext(tournament, page, size, userId);
-    if (matches === null || matches.length < 1) {
-      return res.status(404).json({ message: 'Матчів не знайдено' });
-    }
-    return res.status(200).json(matches);
+    const { id } = req.params;
+    const { status, homeGoals, awayGoals } = req.body;
+    await editOne(id, status, homeGoals, awayGoals, req.headers.authorization);
+    return res.status(201).json({ message: 'Матч успішно оновлено' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -46,8 +27,7 @@ const getNextMatches = async (req, res) => {
 
 const matchController = {
   getAllMatches,
-  getPrevMatches,
-  getNextMatches,
+  editOneMatch,
 };
 
 module.exports = matchController;
