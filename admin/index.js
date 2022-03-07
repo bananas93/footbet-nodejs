@@ -3,14 +3,14 @@ const AdminBro = require('admin-bro');
 const AdminBroSequelize = require('@admin-bro/sequelize');
 const jwt = require('jsonwebtoken');
 const calcFunctions = require('../utils/calcPoints');
-const socket = require('../socketapi');
+const { io } = require('../config/socketapi');
 const db = require('../models');
 const { getBetsByMatch } = require('../services/bet.service');
 
 AdminBro.registerAdapter(AdminBroSequelize);
 
 const {
-  Team, Tournament, Match, User, Bet, Result, Chat,
+  Team, Tournament, Match, User, Bet, Result,
 } = db;
 
 const adminBro = new AdminBro({
@@ -120,7 +120,7 @@ const adminBro = new AdminBro({
                 });
                 result.sort((a, b) => b.dataValues.points - a.dataValues.points);
                 request.payload.bets = result;
-                socket.io.emit('matchUpdate', request.payload);
+                io.emit('matchUpdate', request.payload);
               }
               return originalResponse;
             },
@@ -163,7 +163,6 @@ const adminBro = new AdminBro({
         },
       },
     },
-    { resource: Chat },
   ],
 });
 

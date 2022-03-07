@@ -10,18 +10,18 @@ passport.use(new GoogleStrategy({
   clientSecret: 'zjXRM1LCGyIPFouWFEw7OUIj',
   callbackURL: `${process.env.CLIENT_URL}/api/auth/google/callback`,
 },
-  (async (accessToken, refreshToken, profile, done) => {
-    const { displayName, id, emails } = profile;
-    const user = await db.User.findOrCreate({
-      where: { googleId: id },
-      defaults: {
-        name: displayName,
-        googleId: id,
-        email: emails[0].value,
-      },
-    });
-    done(user);
-  })));
+(async (accessToken, refreshToken, profile, done) => {
+  const { displayName, id, emails } = profile;
+  const user = await db.User.findOrCreate({
+    where: { googleId: id },
+    defaults: {
+      name: displayName,
+      googleId: id,
+      email: emails[0].value,
+    },
+  });
+  done(user);
+})));
 
 router.get('/', passport.authenticate('google', { scope: ['profile', 'email'] }));
 

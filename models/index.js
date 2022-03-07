@@ -28,7 +28,6 @@ db.Team = require('./team.model')(sequelize, Sequelize);
 db.User = require('./user.model')(sequelize, Sequelize);
 db.Tournament = require('./tournament.model')(sequelize, Sequelize);
 db.Result = require('./result.model')(sequelize, Sequelize);
-db.Chat = require('./chat.model')(sequelize, Sequelize);
 
 db.Tournament.hasMany(db.Result);
 db.Match.hasMany(db.Bet);
@@ -42,7 +41,5 @@ db.User.hasMany(db.Bet);
 db.Result.belongsTo(db.User);
 db.Bet.belongsTo(db.User);
 db.Bet.belongsTo(db.Match);
-db.Chat.belongsTo(db.User);
-db.User.hasMany(db.Chat);
 
 module.exports = db;
