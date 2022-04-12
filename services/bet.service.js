@@ -1,9 +1,11 @@
 /* eslint-disable no-param-reassign */
+const moment = require('moment');
 const db = require('../models');
 const createOrUpdate = require('../helpers/createOrUpdate');
 const calcFunctions = require('../utils/calcPoints');
 
 const createOrUpdateBet = async (userId, homeBet, awayBet, matchId, tournamentId) => {
+  const match = await db.Match.findByPk(matchId);
   const values = {
     homeBet: Number(homeBet),
     awayBet: Number(awayBet),
@@ -15,6 +17,9 @@ const createOrUpdateBet = async (userId, homeBet, awayBet, matchId, tournamentId
     userId: Number(userId),
     matchId: Number(matchId),
   };
+  if (moment().isAfter(match.dataValues.datetime)) {
+    return false;
+  }
   const result = await createOrUpdate(db.Bet, values, condition);
   return result;
 };
