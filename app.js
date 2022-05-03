@@ -54,8 +54,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build')));
 
 forest.init({
-  envSecret: '6097ee6466786c60cf9ecf8bb25f6cf77b357472873f063cc3a035dc8b4ddc85',
-  authSecret: '213b678efd71bca73ad61ecb69cc6fbac5210a0fc2299c8f',
+  envSecret: process.env.FOREST_SECRET,
+  authSecret: process.env.FOREST_AUTH,
   objectMapping: Sequelize,
   connections: { default: db.sequelize },
 }).then((FAMiddleware) => {
