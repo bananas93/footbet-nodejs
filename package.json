@@ -19,6 +19,7 @@
     "express": "~4.16.1",
     "express-formidable": "^1.2.0",
     "express-session": "^1.17.2",
+    "forest-express-sequelize": "^8.5.5",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.2",
     "morgan": "~1.9.1",
