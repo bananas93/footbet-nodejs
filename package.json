@@ -8,7 +8,8 @@
     "test": "jest --forceExit"
   },
   "engines": {
-    "node": "16.14.0"
+    "node": "16.14.0",
+    "npm": "8.3.1"
   },
   "dependencies": {
     "@admin-bro/express": "^3.1.0",
