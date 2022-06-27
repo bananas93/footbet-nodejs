@@ -7,9 +7,7 @@ const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const AdminBroExpress = require('@admin-bro/express');
 const jwt = require('jsonwebtoken');
-const admin = require('./admin');
 const db = require('./models');
 const userService = require('./services/user.service');
 const { io } = require('./config/socketapi');
@@ -37,21 +35,23 @@ const checkToken = require('./utils/checkToken');
 
 const app = express();
 
-const corsOptions = {
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
-
-// app.use(cors());
-// app.options('*', cors());
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: ['http://localhost:8080', 'https://app.forestadmin.com'],
+  credentials: true,
+  preflightContinue: true,
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build')));
+
+app.use('/api/matches', checkToken, require('./routes/matches.route'));
+app.use('/api/results', checkToken, require('./routes/results.route'));
+app.use('/api/bets', checkToken, require('./routes/bets.route'));
+app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
+app.use('/api/users', require('./routes/users.route'));
+app.use('/api/auth/google', require('./routes/auth.route'));
 
 forest.init({
   envSecret: process.env.FOREST_SECRET,
@@ -61,16 +61,6 @@ forest.init({
 }).then((FAMiddleware) => {
   app.use(FAMiddleware);
 });
-
-app.use('/api/matches', checkToken, require('./routes/matches.route'));
-app.use('/api/results', checkToken, require('./routes/results.route'));
-app.use('/api/bets', checkToken, require('./routes/bets.route'));
-app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
-app.use('/api/users', require('./routes/users.route'));
-app.use('/api/auth/google', require('./routes/auth.route'));
-
-const router = AdminBroExpress.buildRouter(admin);
-app.use(admin.options.rootPath, router);
 
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
