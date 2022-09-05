@@ -129,8 +129,8 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, './admin/build', 'index.html'));
 });
 
-// app.get('/*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 module.exports = app;
