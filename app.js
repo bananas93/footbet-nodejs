@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 const express = require('express');
-const forest = require('forest-express-sequelize');
-const Sequelize = require('sequelize');
+const { crud } = require('express-crud-router');
 require('dotenv').config();
 const cors = require('cors');
 const path = require('path');
@@ -34,17 +33,90 @@ db.sequelize.sync();
 const checkToken = require('./utils/checkToken');
 
 const app = express();
-
+app.disable('x-powered-by');
 app.use(cors({
-  origin: ['http://localhost:8080', 'https://app.forestadmin.com'],
-  credentials: true,
+  allowedHeaders: ['sessionId', 'Content-Type'],
+  exposedHeaders: ['sessionId'],
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: true,
 }));
+app.options('*', cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'build')));
+
+app.use(
+  crud('/admin/team', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.Team.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.Team.findByPk(id),
+    create: (body) => db.Team.create(body),
+    update: (id, body) => db.Team.update(body, { where: { id } }),
+    destroy: (id) => db.Team.destroy({ where: { id } }),
+  }),
+);
+
+app.use(
+  crud('/admin/tournaments', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.Tournament.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.Tournament.findByPk(id),
+    create: (body) => db.Tournament.create(body),
+    update: (id, body) => db.Tournament.update(body, { where: { id } }),
+    destroy: (id) => db.Tournament.destroy({ where: { id } }),
+  }),
+);
+
+app.use(
+  crud('/admin/match', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.Match.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.Match.findByPk(id),
+    create: (body) => db.Match.create(body),
+    update: (id, body) => db.Match.update(body, { where: { id } }),
+    destroy: (id) => db.Match.destroy({ where: { id } }),
+  }),
+);
+
+app.use(
+  crud('/admin/bets', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.Bet.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.Bet.findByPk(id),
+    create: (body) => db.Bet.create(body),
+    update: (id, body) => db.Bet.update(body, { where: { id } }),
+    destroy: (id) => db.Bet.destroy({ where: { id } }),
+  }),
+);
+
+app.use(
+  crud('/admin/users', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.User.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.User.findByPk(id),
+    create: (body) => db.User.create(body),
+    update: (id, body) => db.User.update(body, { where: { id } }),
+    destroy: (id) => db.User.destroy({ where: { id } }),
+  }),
+);
 
 app.use('/api/matches', checkToken, require('./routes/matches.route'));
 app.use('/api/results', checkToken, require('./routes/results.route'));
@@ -53,17 +125,12 @@ app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
 app.use('/api/users', require('./routes/users.route'));
 app.use('/api/auth/google', require('./routes/auth.route'));
 
-forest.init({
-  envSecret: process.env.FOREST_SECRET,
-  authSecret: process.env.FOREST_AUTH,
-  objectMapping: Sequelize,
-  connections: { default: db.sequelize },
-}).then((FAMiddleware) => {
-  app.use(FAMiddleware);
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, './admin/build', 'index.html'));
 });
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 module.exports = app;

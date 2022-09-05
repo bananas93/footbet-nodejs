@@ -5,9 +5,8 @@ const getAllMatches = async (req, res) => {
     const userId = req.userData.id;
     const { tournament } = req.params;
     const matches = await findAll(tournament, userId);
-    if (matches === null || matches.length < 1) {
-      return res.status(404).json({ message: 'Матчів не знайдено' });
-    }
+    res.set('Access-Control-Expose-Headers', 'X-Total-Count');
+    res.set('X-Total-Count', matches.length);
     return res.status(200).json(matches);
   } catch (err) {
     return res.status(500).json({ error: err.message });

@@ -1,11 +1,10 @@
-const tournamentsService = require('../services/tournament.service');
+const { findAllTournaments, findTournament } = require('../services/tournament.service');
 
 const getTournaments = async (req, res) => {
   try {
-    const result = await tournamentsService.findAllTournaments();
-    if (result === null || result.length < 1) {
-      return res.status(404).json({ message: 'Турнірів не знайдено' });
-    }
+    const result = await findAllTournaments();
+    res.set('Access-Control-Expose-Headers', 'X-Total-Count');
+    res.set('X-Total-Count', result.length);
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -15,10 +14,7 @@ const getTournaments = async (req, res) => {
 const getTournament = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await tournamentsService.findTournament(id);
-    if (result === null || result.length < 1) {
-      return res.status(404).json({ message: 'Турніру не знайдено' });
-    }
+    const result = await findTournament(id);
     return res.status(200).json(result);
   } catch (err) {
     return res.status(500).json({ error: err.message });

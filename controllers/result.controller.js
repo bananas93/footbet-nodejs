@@ -5,6 +5,8 @@ const getResults = async (req, res) => {
   try {
     const { tournament } = req.params;
     const result = await resultService.findAll(tournament);
+    res.set('Access-Control-Expose-Headers', 'X-Total-Count');
+    res.set('X-Total-Count', result.length);
     if (result === null || result.length < 1) {
       const users = await userService.getAllUsers();
       return res.status(200).json(users);
