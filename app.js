@@ -125,8 +125,10 @@ app.use('/api/tournaments', checkToken, require('./routes/tournament.route'));
 app.use('/api/users', require('./routes/users.route'));
 app.use('/api/auth/google', require('./routes/auth.route'));
 
+app.use(express.static(path.resolve(__dirname, 'admin/build')));
+
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, './admin/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'admin/build', 'index.html'));
 });
 
 app.get('/*', (req, res) => {

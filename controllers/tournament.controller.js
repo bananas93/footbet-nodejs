@@ -1,4 +1,4 @@
-const { findAllTournaments, findTournament } = require('../services/tournament.service');
+const { findAllTournaments, findTournament, findTournamentGroups } = require('../services/tournament.service');
 
 const getTournaments = async (req, res) => {
   try {
@@ -21,9 +21,20 @@ const getTournament = async (req, res) => {
   }
 };
 
+const getTournamentGroups = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await findTournamentGroups(id);
+    return res.status(200).json(result);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 const tournamentController = {
   getTournaments,
   getTournament,
+  getTournamentGroups,
 };
 
 module.exports = tournamentController;

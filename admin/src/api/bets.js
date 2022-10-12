@@ -114,9 +114,12 @@ export const BetsCreate = (props) => (
   <Create {...props} title="Create a Bets">
     <SimpleForm>
       <ReferenceInput label="Match" source="matchId" reference="match">
-        <SelectInput source="id" />
+        <NumberInput source="matchId" />
       </ReferenceInput>
       <ReferenceInput label="Tournament" source="tournamentId" reference="tournaments">
+        <SelectInput source="name" />
+      </ReferenceInput>
+      <ReferenceInput label="User" source="userId" reference="users">
         <SelectInput source="name" />
       </ReferenceInput>
       <NumberInput source="homeBet" />

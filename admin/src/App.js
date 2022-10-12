@@ -2,16 +2,18 @@
 /* eslint-disable no-param-reassign */
 import { Admin, Resource, fetchUtils } from 'react-admin';
 import simpleRestProvider from 'ra-data-simple-rest';
+import { createBrowserHistory } from 'history';
 
 import { TournamentList, TournamentShow, TournamentEdit, TournamentCreate } from './api/tournaments';
 import { TeamList, TeamShow, TeamEdit, TeamCreate } from './api/teams';
 import { MatchList, MatchShow, MatchEdit, MatchCreate } from './api/matches';
 import { BetsList, BetsShow, BetsEdit, BetsCreate } from './api/bets';
 
-const dataProvider = simpleRestProvider('http://localhost:3000/admin', fetchUtils.fetchJson, 'X-Total-Count');
+const dataProvider = simpleRestProvider('https://footbet.pp.ua/admin', fetchUtils.fetchJson, 'X-Total-Count');
+const history = createBrowserHistory();
 
 const App = () => (
-  <Admin dataProvider={dataProvider}>
+  <Admin basename="/admin" dataProvider={dataProvider} history={history}>
     <Resource
       name="tournaments"
       list={TournamentList}
