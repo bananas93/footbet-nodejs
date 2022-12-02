@@ -91,19 +91,15 @@ export const BetsEdit = (props) => (
   <Edit {...props} title={<BetsTitle />}>
     <SimpleForm>
       <NumberInput disabled source="id" />
-      <ReferenceField label="Match" source="matchId" reference="match">
-        <ReferenceField label="Home" source="home_team" reference="team">
-          <SelectInput source="name" />
-        </ReferenceField>
-      </ReferenceField>
-      <ReferenceField label="Match" source="matchId" reference="match">
-        <ReferenceField label="Away" source="away_team" reference="team">
-          <SelectInput source="name" />
-        </ReferenceField>
-      </ReferenceField>
-      <ReferenceField label="Tournament" source="tournamentId" reference="tournaments">
+      <ReferenceInput label="Match" source="matchId" reference="match">
+        <NumberInput source="matchId" />
+      </ReferenceInput>
+      <ReferenceInput label="Tournament" source="tournamentId" reference="tournaments">
         <SelectInput source="name" />
-      </ReferenceField>
+      </ReferenceInput>
+      <ReferenceInput label="User" source="userId" reference="users">
+        <SelectInput source="name" />
+      </ReferenceInput>
       <NumberInput source="homeBet" />
       <NumberInput source="awayBet" />
     </SimpleForm>

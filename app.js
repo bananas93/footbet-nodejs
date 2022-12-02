@@ -63,6 +63,20 @@ app.use(
 );
 
 app.use(
+  crud('/admin/results', {
+    getList: ({
+      filter, limit, offset, order,
+    }) => db.Result.findAndCountAll({
+      limit, offset, order, where: filter,
+    }),
+    getOne: (id) => db.Result.findByPk(id),
+    create: (body) => db.Result.create(body),
+    update: (id, body) => db.Result.update(body, { where: { id } }),
+    destroy: (id) => db.Result.destroy({ where: { id } }),
+  }),
+);
+
+app.use(
   crud('/admin/tournaments', {
     getList: ({
       filter, limit, offset, order,

@@ -31,9 +31,23 @@ const getResultsByTour = async (req, res) => {
   }
 };
 
+const getResultsByMatch = async (req, res) => {
+  try {
+    const { tournament } = req.params;
+    const result = await resultService.findByMatch(tournament);
+    if (result === null || result.length < 1) {
+      return res.status(200).json([]);
+    }
+    return res.status(200).json(result);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 const resultController = {
   getResults,
   getResultsByTour,
+  getResultsByMatch,
 };
 
 module.exports = resultController;

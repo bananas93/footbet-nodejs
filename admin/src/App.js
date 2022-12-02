@@ -8,6 +8,7 @@ import { TournamentList, TournamentShow, TournamentEdit, TournamentCreate } from
 import { TeamList, TeamShow, TeamEdit, TeamCreate } from './api/teams';
 import { MatchList, MatchShow, MatchEdit, MatchCreate } from './api/matches';
 import { BetsList, BetsShow, BetsEdit, BetsCreate } from './api/bets';
+import { ResultsList, ResultsShow, ResultsEdit, ResultsCreate } from './api/results';
 
 const dataProvider = simpleRestProvider('https://footbet.pp.ua/admin', fetchUtils.fetchJson, 'X-Total-Count');
 const history = createBrowserHistory();
@@ -41,6 +42,13 @@ const App = () => (
       show={BetsShow}
       edit={BetsEdit}
       create={BetsCreate}
+    />
+    <Resource
+      name="results"
+      list={ResultsList}
+      show={ResultsShow}
+      edit={ResultsEdit}
+      create={ResultsCreate}
     />
   </Admin>
 );
