@@ -32,6 +32,7 @@ class League {
     if (!this.table[group]) this.table[group] = [];
     if (!this.table[group].some((item) => item.team === team)) {
       this.table[group].push({
+        id: team,
         team,
         played: 0,
         won: 0,

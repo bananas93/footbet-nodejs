@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Match = sequelize.define('match', {
     stage: {
-      type: DataTypes.ENUM('1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур', '1/16 фіналу', '1/8 фіналу', '1/4 фіналу', '1/2 фіналу', 'Фінал'),
+      type: DataTypes.ENUM('1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур', 'Матч за 3-тє місце', '1/16 фіналу', '1/8 фіналу', '1/4 фіналу', '1/2 фіналу', 'Фінал'),
       allowNull: false,
     },
     group: {
