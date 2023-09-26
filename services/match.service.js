@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 const jwt = require('jsonwebtoken');
+const sendPushNotification = require('../firebase');
 const { io } = require('../config/socketapi');
 const db = require('../models');
 const calcFunctions = require('../utils/calcPoints');
@@ -27,25 +28,18 @@ const findAll = async (tournament, userId) => {
           model: db.Bet,
           as: 'bets',
           attributes: ['id', 'homeBet', 'awayBet'],
-          include: [
-            { model: db.User, as: 'user', attributes: ['id', 'name'] },
-          ],
+          include: [{ model: db.User, as: 'user', attributes: ['id', 'name'] }],
         },
       ],
     });
     if (matches === null || matches.length < 1) {
       return [];
     }
-    matches = matches.map((game) => {
-      game.bets.map((bet) => {
+    matches = matches.map(game => {
+      game.bets.map(bet => {
         bet.dataValues.bet = `${bet.homeBet}-${bet.awayBet}`;
         const myBet = bet.dataValues.user.id === userId;
-        const points = calcFunctions.calculate(
-          bet.homeBet,
-          bet.awayBet,
-          game.homeGoals,
-          game.awayGoals,
-        );
+        const points = calcFunctions.calculate(bet.homeBet, bet.awayBet, game.homeGoals, game.awayGoals);
         bet.dataValues.points = points.all;
         bet.dataValues.myBet = myBet;
         return bet;
@@ -84,7 +78,7 @@ const editOne = async (id, status, homeGoals, awayGoals, JWToken) => {
     const decoded = jwt.verify(JWToken, process.env.JWT_SECRET);
     calcFunctions.calcultePoints(result);
     let res = await getBetsByMatch(result.dataValues.id);
-    res = res.map((bet) => {
+    res = res.map(bet => {
       const myBet = bet.dataValues.user.id === decoded.id;
       bet.dataValues.bet = `${bet.homeBet}-${bet.awayBet}`;
       const points = calcFunctions.calculate(
@@ -97,9 +91,16 @@ const editOne = async (id, status, homeGoals, awayGoals, JWToken) => {
       bet.dataValues.myBet = myBet;
       return bet;
     });
+
     res.sort((a, b) => b.dataValues.points - a.dataValues.points);
     result.dataValues.bets = res;
     io.emit('matchUpdate', result.dataValues);
+
+    const payload = {
+      title: 'Оновлення матчу',
+      body: `Статус матчу ${status ? 'Live' : 'Завершено'}`,
+    };
+    sendPushNotification(payload);
     return true;
   } catch (err) {
     return err.message;

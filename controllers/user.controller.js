@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const userService = require('../services/user.service');
 
 const userRegister = async (req, res) => {
@@ -20,7 +21,7 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
     const token = await userService.userLogin(email, password);
     if (token instanceof Error) {
-      throw (token);
+      throw token;
     }
     return res.status(200).json({ token });
   } catch (err) {
@@ -72,6 +73,33 @@ const updateUserInfo = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+const getTokenFromHeader = req => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return null;
+  }
+  const token = authHeader.split(' ')[1];
+  return token;
+};
+const getUserIdFromToken = token => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.id;
+  } catch (error) {
+    return null;
+  }
+};
+const saveRegistrationToken = async (req, res) => {
+  try {
+    const JWToken = getTokenFromHeader(req);
+    const userId = getUserIdFromToken(JWToken);
+    const { token } = req.body;
+    const result = await userService.saveUpdateRegistrationToken(userId, token);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const getAllUsers = async (req, res) => {
   try {
@@ -103,6 +131,7 @@ const userController = {
   userLogin,
   userInfo,
   updateUserInfo,
+  saveRegistrationToken,
   getAllUsers,
   getUserDetails,
   getOneUser,
