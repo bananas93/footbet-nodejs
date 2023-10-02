@@ -17,33 +17,44 @@ const userRegister = async (email, name, password) => {
 };
 
 const userLogin = async (email, password) => {
-  const result = { error: false };
-  const user = await db.User.findByCredentials(email, password);
-  if (!user) {
-    result.error = true;
-    return result;
+  try {
+    const user = await db.User.findByCredentials(email, password);
+    if (user instanceof Error) {
+      throw user;
+    }
+    const token = await db.User.generateAuthToken(user);
+    return token;
+  } catch (error) {
+    return error;
   }
-  const token = await db.User.generateAuthToken(user);
-  result.token = token;
-  return result;
 };
 
-const userDetails = async (id) => {
+const userDetails = async id => {
   const user = await db.User.findByPk(id);
   return user;
 };
 
-const updateUser = async (id, email, name, password) => {
+const updateUser = async (id, name, password) => {
   const user = await db.User.findByPk(id);
   if (!user) {
     return false;
   }
-  const result = await user.update({ email, name, password });
+  const result = await user.update({ name, password });
   return result;
 };
+
+const saveUpdateRegistrationToken = async (id, token) => {
+  const user = await db.User.findByPk(id);
+  if (!user) {
+    return false;
+  }
+  const result = await user.update({ registrationToken: token });
+  return result;
+};
+
 const getAllUsers = async () => {
   const users = await db.User.findAll({ attributes: ['id', ['name', 'user_name']] });
-  const result = users.map((user) => {
+  const result = users.map(user => {
     const newData = user.dataValues;
     newData.rank = 1;
     newData.matches = 0;
@@ -83,7 +94,9 @@ const usersDetails = async (id, tournament, tour) => {
     ],
     include: [
       {
-        model: db.User, as: 'user', attributes: ['id', 'name'],
+        model: db.User,
+        as: 'user',
+        attributes: ['id', 'name'],
       },
     ],
   });
@@ -126,34 +139,31 @@ const usersDetails = async (id, tournament, tour) => {
     return [];
   }
 
-  matches = matches.filter((game) => game.bets.length > 0).map((game) => {
-    const { 0: bet } = game.bets;
-    game.dataValues.bet = bet;
-    delete game.dataValues.bets;
-    const points = calcFunctions.calculate(
-      bet.homeBet,
-      bet.awayBet,
-      game.homeGoals,
-      game.awayGoals,
-    );
-    bet.dataValues.points = points.all;
-    if (points.all === 0) {
-      bet.dataValues.empty = true;
-    }
-    if (points.all === 2) {
-      bet.dataValues.score = true;
-    }
-    if (points.all === 3) {
-      bet.dataValues.difference = true;
-    }
-    if (points.all === 5) {
-      bet.dataValues.result = true;
-    }
-    if (points.all === 6) {
-      bet.dataValues.goals5 = true;
-    }
-    return game;
-  });
+  matches = matches
+    .filter(game => game.bets.length > 0)
+    .map(game => {
+      const { 0: bet } = game.bets;
+      game.dataValues.bet = bet;
+      delete game.dataValues.bets;
+      const points = calcFunctions.calculate(bet.homeBet, bet.awayBet, game.homeGoals, game.awayGoals);
+      bet.dataValues.points = points.all;
+      if (points.all === 0) {
+        bet.dataValues.empty = true;
+      }
+      if (points.all === 2) {
+        bet.dataValues.score = true;
+      }
+      if (points.all === 3) {
+        bet.dataValues.difference = true;
+      }
+      if (points.all === 5) {
+        bet.dataValues.result = true;
+      }
+      if (points.all === 6) {
+        bet.dataValues.goals5 = true;
+      }
+      return game;
+    });
 
   return { result, matches };
 };
@@ -165,6 +175,7 @@ const userService = {
   updateUser,
   getAllUsers,
   usersDetails,
+  saveUpdateRegistrationToken,
 };
 
 module.exports = userService;

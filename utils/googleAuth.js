@@ -8,7 +8,6 @@ passport.use(new GoogleStrategy({
   callbackURL: 'http://www.example.com/auth/google/callback',
 },
 ((accessToken, refreshToken, profile, done) => {
-  console.log(profile.email);
   // db.User.findOrCreate({ googleId: profile.id }, (err, user) => done(err, user));
 })));
 

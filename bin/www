@@ -7,7 +7,7 @@
 const http = require('http');
 const debug = require('debug')('footbet:server');
 const app = require('../app');
-const socketapi = require('../socketapi');
+const { io } = require('../config/socketapi');
 
 /**
  * Normalize a port into a number, string, or false.
@@ -41,7 +41,7 @@ app.set('port', port);
  */
 
 const server = http.createServer(app);
-socketapi.io.attach(server);
+io.attach(server);
 
 /**
  * Listen on provided port, on all network interfaces.
