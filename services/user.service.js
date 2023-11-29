@@ -70,6 +70,7 @@ const getAllUsers = async () => {
 };
 
 const usersDetails = async (id, tournament) => {
+  const user = await userDetails(id);
   const matches = await db.Match.findAll({
     attributes: ['id', 'stage', 'homeGoals', 'awayGoals'],
     where: {
@@ -116,39 +117,41 @@ const usersDetails = async (id, tournament) => {
   let predictMatches = 0;
   const teamPoints = {};
 
-  matches.forEach(match => {
-    const { homeGoals, awayGoals } = match;
-    const { homeBet, awayBet } = match.bets[0];
+  matches
+    .filter(game => game.bets.length > 0)
+    .forEach(match => {
+      const { homeGoals, awayGoals } = match;
+      const { homeBet, awayBet } = match.bets[0];
 
-    const {
-      score,
-      result,
-      difference,
-      goals5,
-      all,
-      matches: predictMatch,
-    } = calcFunctions.calculate(homeBet, awayBet, homeGoals, awayGoals);
+      const {
+        score,
+        result,
+        difference,
+        goals5,
+        all,
+        matches: predictMatch,
+      } = calcFunctions.calculate(homeBet, awayBet, homeGoals, awayGoals);
 
-    exactScoreCount += score;
-    correctResultCount += result;
-    goalDifferenceCount += difference;
-    fivePlusGoalsCount += goals5;
-    predictMatches += predictMatch;
+      exactScoreCount += score;
+      correctResultCount += result;
+      goalDifferenceCount += difference;
+      fivePlusGoalsCount += goals5;
+      predictMatches += predictMatch;
 
-    // Update team points
-    if (homeGoals > awayGoals) {
-      teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
-    } else if (homeGoals < awayGoals) {
-      teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
-    } else {
-      teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
-      teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
-    }
+      // Update team points
+      if (homeGoals > awayGoals) {
+        teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
+      } else if (homeGoals < awayGoals) {
+        teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
+      } else {
+        teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
+        teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
+      }
 
-    if (score > 0) {
-      exactScoreMatches.push(match);
-    }
-  });
+      if (score > 0) {
+        exactScoreMatches.push(match);
+      }
+    });
 
   // Find the favorite teams
   const favoriteTeams = Object.keys(teamPoints)
@@ -160,13 +163,15 @@ const usersDetails = async (id, tournament) => {
     }));
 
   return {
-    'Кількість матчів': predictMatches,
-    'Точних рахунків': exactScoreCount,
-    'Вгадані результати': correctResultCount,
-    'Вгадана різниця': goalDifferenceCount,
-    'Вгадано 5+ голів': fivePlusGoalsCount,
-    'Улюблені команди': favoriteTeams,
-    'Точні рахунки': exactScoreMatches,
+    user,
+    matchesCount: matches.length,
+    predictMatches,
+    exactScoreCount,
+    correctResultCount,
+    goalDifferenceCount,
+    fivePlusGoalsCount,
+    favoriteTeams,
+    exactScoreMatches,
   };
 };
 
