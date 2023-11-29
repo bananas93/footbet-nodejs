@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-param-reassign */
 const db = require('../models');
 const calcFunctions = require('../utils/calcPoints');
@@ -68,44 +69,12 @@ const getAllUsers = async () => {
   return result;
 };
 
-const usersDetails = async (id, tournament, tour) => {
-  const result = await db.Result.findAll({
-    where: {
-      userId: id,
-      tournament_id: tournament,
-    },
-    attributes: [
-      'id',
-      'userId',
-      [db.sequelize.fn('count', '*'), 'matches'],
-      [db.sequelize.fn('sum', db.sequelize.col('result.goals5')), 'goals5'],
-      [db.sequelize.fn('sum', db.sequelize.col('result.difference')), 'difference'],
-      [db.sequelize.fn('sum', db.sequelize.col('result.result')), 'result'],
-      [db.sequelize.fn('sum', db.sequelize.col('result.score')), 'score'],
-      [db.sequelize.fn('sum', db.sequelize.col('result.all')), 'all'],
-    ],
-    order: [
-      [db.sequelize.fn('SUM', db.sequelize.col('result.all')), 'DESC'],
-      [db.sequelize.fn('SUM', db.sequelize.col('result.score')), 'DESC'],
-      [db.sequelize.fn('SUM', db.sequelize.col('result.result')), 'DESC'],
-      [db.sequelize.fn('SUM', db.sequelize.col('result.difference')), 'DESC'],
-      [db.sequelize.fn('SUM', db.sequelize.col('result.goals5')), 'DESC'],
-      [db.sequelize.fn('count', '*'), 'ASC'],
-    ],
-    include: [
-      {
-        model: db.User,
-        as: 'user',
-        attributes: ['id', 'name'],
-      },
-    ],
-  });
-  let matches = await db.Match.findAll({
+const usersDetails = async (id, tournament) => {
+  const matches = await db.Match.findAll({
     attributes: ['id', 'stage', 'homeGoals', 'awayGoals'],
     where: {
       tournament_id: tournament,
       status: ['Live', 'Завершено'],
-      stage: tour ? `${tour} тур` : ['1 тур', '2 тур', '3 тур', '4 тур', '5 тур', '6 тур'],
     },
     include: [
       {
@@ -139,33 +108,66 @@ const usersDetails = async (id, tournament, tour) => {
     return [];
   }
 
-  matches = matches
-    .filter(game => game.bets.length > 0)
-    .map(game => {
-      const { 0: bet } = game.bets;
-      game.dataValues.bet = bet;
-      delete game.dataValues.bets;
-      const points = calcFunctions.calculate(bet.homeBet, bet.awayBet, game.homeGoals, game.awayGoals);
-      bet.dataValues.points = points.all;
-      if (points.all === 0) {
-        bet.dataValues.empty = true;
-      }
-      if (points.all === 2) {
-        bet.dataValues.score = true;
-      }
-      if (points.all === 3) {
-        bet.dataValues.difference = true;
-      }
-      if (points.all === 5) {
-        bet.dataValues.result = true;
-      }
-      if (points.all === 6) {
-        bet.dataValues.goals5 = true;
-      }
-      return game;
-    });
+  const exactScoreMatches = [];
+  let exactScoreCount = 0;
+  let correctResultCount = 0;
+  let goalDifferenceCount = 0;
+  let fivePlusGoalsCount = 0;
+  let predictMatches = 0;
+  const teamPoints = {};
 
-  return { result, matches };
+  matches.forEach(match => {
+    const { homeGoals, awayGoals } = match;
+    const { homeBet, awayBet } = match.bets[0];
+
+    const {
+      score,
+      result,
+      difference,
+      goals5,
+      all,
+      matches: predictMatch,
+    } = calcFunctions.calculate(homeBet, awayBet, homeGoals, awayGoals);
+
+    exactScoreCount += score;
+    correctResultCount += result;
+    goalDifferenceCount += difference;
+    fivePlusGoalsCount += goals5;
+    predictMatches += predictMatch;
+
+    // Update team points
+    if (homeGoals > awayGoals) {
+      teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
+    } else if (homeGoals < awayGoals) {
+      teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
+    } else {
+      teamPoints[match.homeTeam.name] = (teamPoints[match.homeTeam.name] || 0) + all;
+      teamPoints[match.awayTeam.name] = (teamPoints[match.awayTeam.name] || 0) + all;
+    }
+
+    if (score > 0) {
+      exactScoreMatches.push(match);
+    }
+  });
+
+  // Find the favorite teams
+  const favoriteTeams = Object.keys(teamPoints)
+    .sort((a, b) => teamPoints[b] - teamPoints[a])
+    .slice(0, 10)
+    .map(team => ({
+      team,
+      points: teamPoints[team],
+    }));
+
+  return {
+    'Кількість матчів': predictMatches,
+    'Точних рахунків': exactScoreCount,
+    'Вгадані результати': correctResultCount,
+    'Вгадана різниця': goalDifferenceCount,
+    'Вгадано 5+ голів': fivePlusGoalsCount,
+    'Улюблені команди': favoriteTeams,
+    'Точні рахунки': exactScoreMatches,
+  };
 };
 
 const userService = {
