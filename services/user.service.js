@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 const db = require('../models');
 const calcFunctions = require('../utils/calcPoints');
+const createOrUpdate = require('../helpers/createOrUpdate');
 
 const userRegister = async (email, name, password) => {
   const result = { alreadyRegister: false };
@@ -49,7 +50,14 @@ const saveUpdateRegistrationToken = async (id, token) => {
   if (!user) {
     return false;
   }
-  const result = await user.update({ registrationToken: token });
+  const values = {
+    registrationToken: token,
+    userId: id,
+  };
+  const condition = {
+    registrationToken: token,
+  };
+  const result = await createOrUpdate(db.Notification, values, condition);
   return result;
 };
 

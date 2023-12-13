@@ -1,5 +1,4 @@
 const admin = require('firebase-admin');
-const { Op } = require('sequelize');
 const db = require('./models');
 const serviceAccount = require('./footbet-2d3b7-firebase-adminsdk-e1wcx-7e697e213d.json');
 
@@ -9,14 +8,13 @@ admin.initializeApp({
 
 async function sendPushNotification(payload) {
   try {
-    const users = await db.User.findAll({ where: { registrationToken: { [Op.not]: null } } });
-    const registrationTokens = users.map(user => user.registrationToken);
-    const messages = registrationTokens.map(token => ({
+    const registrationTokens = await db.Notification.findAll({ raw: true });
+    const messages = registrationTokens.map(({ registrationToken }) => ({
       notification: {
         title: payload.title,
         body: payload.body,
       },
-      token,
+      token: registrationToken,
     }));
     const response = await admin.messaging().sendEach(messages);
     console.log('Successfully sent message:', response);

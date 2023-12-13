@@ -16,8 +16,8 @@ const getAllMatches = async (req, res) => {
 const editOneMatch = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, homeGoals, awayGoals } = req.body;
-    await editOne(id, status, homeGoals, awayGoals, req.headers.authorization);
+    const { status, homeGoals, awayGoals, type } = req.body;
+    await editOne(id, status, homeGoals, awayGoals, type, req.headers.authorization);
     return res.status(201).json({ message: 'Матч успішно оновлено' });
   } catch (err) {
     return res.status(500).json({ error: err.message });

@@ -67,7 +67,7 @@ const findAll = async (tournament, userId) => {
   }
 };
 
-const editOne = async (id, status, homeGoals, awayGoals, JWToken) => {
+const editOne = async (id, status, homeGoals, awayGoals, type, JWToken) => {
   try {
     const match = await db.Match.findByPk(id);
     if (!match) {
@@ -95,10 +95,19 @@ const editOne = async (id, status, homeGoals, awayGoals, JWToken) => {
     res.sort((a, b) => b.dataValues.points - a.dataValues.points);
     result.dataValues.bets = res;
     io.emit('matchUpdate', result.dataValues);
-
+    let message = 'Оновлення матчу';
+    if (type === 'start') {
+      message = 'Матч розпочато';
+    }
+    if (type === 'end') {
+      message = 'Матч завершився';
+    }
+    if (type === 'goal') {
+      message = `${result.dataValues.homeTeam} ${homeGoals} - ${awayGoals} ${result.dataValues.awayTeam}`;
+    }
     const payload = {
       title: 'Оновлення матчу',
-      body: `Статус матчу ${status ? 'Live' : 'Завершено'}`,
+      body: message,
     };
     sendPushNotification(payload);
     return true;
