@@ -30,7 +30,6 @@ io.use((socket, next) => {
 // db.sequelize.sync({ alter: true });
 
 const checkToken = require('./utils/checkToken');
-const sendPushNotification = require('./firebase');
 
 const app = express();
 app.disable('x-powered-by');
@@ -145,8 +144,6 @@ app.use(
     destroy: id => db.User.destroy({ where: { id } }),
   }),
 );
-
-sendPushNotification({ title: 'test', body: 'test' });
 
 app.use('/api/matches', checkToken, require('./routes/matches.route'));
 app.use('/api/results', checkToken, require('./routes/results.route'));
